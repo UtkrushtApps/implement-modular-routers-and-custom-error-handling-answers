@@ -1,2 +1,9 @@
-# implement-modular-routers-and-custom-error-handling-answers
-Assessment task repository
+1. **Set Up Modular Structure**: Create separate files for the API router (`transaction_router.py`), logger utility (`transaction_logger.py`), and custom error handler (`error_handlers.py`). The entrypoint remains in `main.py`.
+2. **Implement the Transaction Router**: In `transaction_router.py`, define a POST endpoint `/process` that accepts a transaction request. Benchmarking (request timing) is done with `time.perf_counter()`. Parse and validate JSON body, simulate transaction handling, and capture exceptions.
+3. **Asynchronous Logging with BackgroundTasks**: Use FastAPI's `BackgroundTasks` dependency to call a log-writing function in the background. The log-writing function stores audit info including request, response, duration, status, and errors to an in-memory list, protected by a lock for thread safety.
+4. **Benchmarking Covers All Scenarios**: Ensure the duration (ms) is computed and logged even on exceptions or validation errors.
+5. **Custom Exception Handling**: In `error_handlers.py`, define a custom exception class (`CustomAPIException`) and exception handlers for both custom and generic exceptions, and for FastAPI validation errors. All responses have consistent JSON structure: `{success: False, error: {message, code, ...}}`.
+6. **Wire Up Error Handlers in App**: In `main.py`, register these custom exception handlers with FastAPI using `add_exception_handler()`.
+7. **Test Log Retrieval**: For demonstration, create a simple `/logs` endpoint in `main.py` to fetch in-memory audit logs.
+8. **Requirements and Dockerization**: Pin FastAPI and Uvicorn in `requirements.txt`. In `Dockerfile`, follow best practices: base image is `python:3.11-slim`, create a virtualenv, install with `pip`, and set the default command to run with Uvicorn on `0.0.0.0:8080`.
+9. **Testing**: Run locally with `docker build -t fastapi-tx .` and `docker run -p 8080:8080 fastapi-tx`. Test `/transaction/process` and `/logs`. Verify errors yield structured responses.
